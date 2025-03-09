@@ -28,6 +28,7 @@ const PurePreviewMessage = ({
   reload,
   isReadonly,
   index,
+  messages,
 }: {
   chatId: string;
   message: Message;
@@ -41,6 +42,7 @@ const PurePreviewMessage = ({
   ) => Promise<string | null | undefined>;
   isReadonly: boolean;
   index: number;
+  messages: Message[];
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
@@ -209,6 +211,7 @@ const PurePreviewMessage = ({
                 message={message}
                 vote={vote}
                 isLoading={isLoading}
+                messages={messages}
               />
             )}
           </div>

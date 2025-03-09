@@ -13,6 +13,10 @@ import { Messages } from './messages';
 import { VisibilityType } from './visibility-selector';
 import { useArtifactSelector } from '@/hooks/use-artifact';
 import { toast } from 'sonner';
+import { BranchedChat } from './branched-chat';
+import { useBranchedChat } from '@/hooks/use-branched-chat';
+import { AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export function Chat({
   id,
@@ -28,6 +32,7 @@ export function Chat({
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
+  const { isVisible, chatId, hide } = useBranchedChat();
 
   const {
     messages,
@@ -50,7 +55,7 @@ export function Chat({
       mutate('/api/history');
     },
     onError: () => {
-      toast.error('An error occured, please try again!');
+      toast.error('An error occurred, please try again!');
     },
   });
 
@@ -63,8 +68,11 @@ export function Chat({
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
   return (
-    <>
-      <div className="flex flex-col min-w-0 h-dvh bg-background">
+    <div className="flex flex-row w-full h-dvh">
+      <div className={cn("flex flex-col min-w-0 bg-background transition-all", {
+        "w-full": !isVisible,
+        "w-[50%]": isVisible,
+      })}>
         <ChatHeader
           chatId={id}
           selectedModelId={selectedChatModel}
@@ -102,6 +110,16 @@ export function Chat({
         </form>
       </div>
 
+      <AnimatePresence>
+        {isVisible && chatId && (
+          <BranchedChat
+            chatId={chatId}
+            onClose={hide}
+            selectedChatModel={selectedChatModel}
+          />
+        )}
+      </AnimatePresence>
+
       <Artifact
         chatId={id}
         input={input}
@@ -118,6 +136,6 @@ export function Chat({
         votes={votes}
         isReadonly={isReadonly}
       />
-    </>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Toaster } from 'sonner';
+import { Analytics } from "@vercel/analytics/react"
 
 import { ThemeProvider } from '@/components/theme-provider';
 
