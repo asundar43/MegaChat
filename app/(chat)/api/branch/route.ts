@@ -2,6 +2,7 @@ import { auth } from '@/app/(auth)/auth';
 import { generateUUID } from '@/lib/utils';
 import { saveChat, saveMessages } from '@/lib/db/queries';
 import { Message } from 'ai';
+import { generateTitleFromUserMessage } from '../../actions';
 
 export async function POST(request: Request) {
   try {
@@ -24,11 +25,17 @@ export async function POST(request: Request) {
     const branchedMessages = messages.slice(0, messageIndex + 1);
     const newChatId = generateUUID();
 
+    // Generate a title based on the first user message
+    const firstUserMessage = branchedMessages.find(m => m.role === 'user');
+    const title = firstUserMessage 
+      ? await generateTitleFromUserMessage({ message: firstUserMessage })
+      : 'Branched Chat';
+
     // Save the new chat with parent reference
     await saveChat({
       id: newChatId,
       userId: session.user.id,
-      title: 'Branched Chat',
+      title,
       parentId: chatId,
     });
 
