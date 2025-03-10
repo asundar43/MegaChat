@@ -51,6 +51,7 @@ import {
 import type { Chat } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
+import { useBranchedChat } from '@/hooks/use-branched-chat';
 
 type GroupedChats = {
   today: Chat[];
@@ -77,13 +78,29 @@ const PureChatItem = ({
     chatId: chat.id,
     initialVisibility: chat.visibility,
   });
+  const { show: showBranchedChat } = useBranchedChat();
+  const router = useRouter();
+
+  const handleChatClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setOpenMobile(false);
+    
+    if (chat.parentId) {
+      // If it's a branched chat, navigate to parent and show branch
+      router.push(`/chat/${chat.parentId}`);
+      showBranchedChat(chat.id);
+    } else {
+      // If it's a main chat, just navigate
+      router.push(`/chat/${chat.id}`);
+    }
+  };
 
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={isActive}>
         <Link 
           href={`/chat/${chat.id}`} 
-          onClick={() => setOpenMobile(false)}
+          onClick={handleChatClick}
           className={cn("flex items-center", {
             "pl-8": level > 0,
           })}

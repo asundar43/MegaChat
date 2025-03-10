@@ -18,28 +18,57 @@ import {
 import { memo } from 'react';
 import equal from 'fast-deep-equal';
 
-export function PureMessageActions({
+interface MessageActionsProps {
+  chatId: string;
+  message: Message;
+  vote: Vote | undefined;
+  isLoading: boolean;
+  messages: Message[];
+  showRecommendations?: boolean;
+}
+
+function PureMessageActions({
   chatId,
   message,
   vote,
   isLoading,
   messages,
-}: {
-  chatId: string;
-  message: Message;
-  vote: Vote | undefined;
-  isLoading: boolean;
-  messages: Array<Message>;
-}) {
+  showRecommendations = true,
+}: MessageActionsProps) {
   const { mutate } = useSWRConfig();
   const [_, copyToClipboard] = useCopyToClipboard();
   const router = useRouter();
   const { show: showBranchedChat } = useBranchedChat();
 
-  if (isLoading) return null;
-  if (message.role === 'user') return null;
-  if (message.toolInvocations && message.toolInvocations.length > 0)
+  const handleBranch = async () => {
+    try {
+      const response = await fetch('/api/branch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages,
+          messageId: message.id,
+          chatId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to branch chat');
+      }
+
+      const { chatId: branchedChatId } = await response.json();
+      showBranchedChat(branchedChatId, true);
+    } catch (error) {
+      console.error('Failed to branch chat:', error);
+      toast.error('Failed to branch chat');
+    }
+  };
+
+  if (isLoading || message.role === 'user' || message.toolInvocations) {
     return null;
+  }
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -60,40 +89,20 @@ export function PureMessageActions({
           <TooltipContent>Copy</TooltipContent>
         </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="py-1 px-2 h-fit text-muted-foreground"
-              variant="outline"
-              onClick={async () => {
-                const messageIndex = messages.findIndex((m) => m.id === message.id);
-                const branchedMessages = messages.slice(0, messageIndex + 1);
-
-                const branchPromise = fetch('/api/branch', {
-                  method: 'POST',
-                  body: JSON.stringify({
-                    messages: branchedMessages,
-                    messageId: message.id,
-                    chatId,
-                  }),
-                });
-
-                toast.promise(branchPromise, {
-                  loading: 'Creating branch...',
-                  success: async (response) => {
-                    const { chatId: newChatId } = await response.json();
-                    showBranchedChat(newChatId);
-                    return 'Branch created successfully!';
-                  },
-                  error: 'Failed to create branch.',
-                });
-              }}
-            >
-              <BranchIcon />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Branch from this message</TooltipContent>
-        </Tooltip>
+        {showRecommendations && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="py-1 px-2 h-fit text-muted-foreground"
+                variant="outline"
+                onClick={handleBranch}
+              >
+                <BranchIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Branch from this message</TooltipContent>
+          </Tooltip>
+        )}
 
         <Tooltip>
           <TooltipTrigger asChild>

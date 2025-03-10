@@ -32,7 +32,7 @@ export function Chat({
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
-  const { isVisible, chatId, hide } = useBranchedChat();
+  const { isVisible, chatId, isNewBranch, hide } = useBranchedChat();
 
   const {
     messages,
@@ -116,6 +116,7 @@ export function Chat({
             chatId={chatId}
             onClose={hide}
             selectedChatModel={selectedChatModel}
+            isNewBranch={isNewBranch}
           />
         )}
       </AnimatePresence>

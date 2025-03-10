@@ -17,14 +17,24 @@ interface BranchedChatProps {
   chatId: string;
   onClose: () => void;
   selectedChatModel: string;
+  isNewBranch?: boolean;
 }
 
-export function BranchedChat({ chatId, onClose, selectedChatModel }: BranchedChatProps) {
+export function BranchedChat({ 
+  chatId, 
+  onClose, 
+  selectedChatModel,
+  isNewBranch = false 
+}: BranchedChatProps) {
   const { width: windowWidth } = useWindowSize();
   const { open: isSidebarOpen } = useSidebar();
   const isMobile = windowWidth ? windowWidth < 768 : false;
 
   const { data: chat, error } = useSWR<Chat>(`/api/chat?id=${chatId}`, fetcher);
+  const { data: messagesData } = useSWR<Array<Message>>(
+    `/api/messages?chatId=${chatId}`,
+    fetcher,
+  );
 
   useEffect(() => {
     if (error) {
@@ -46,7 +56,7 @@ export function BranchedChat({ chatId, onClose, selectedChatModel }: BranchedCha
   } = useChat({
     id: chatId,
     body: { id: chatId, selectedChatModel },
-    initialMessages: [],
+    initialMessages: messagesData || [],
     experimental_throttle: 100,
     sendExtraMessageFields: true,
     generateId: generateUUID,
@@ -103,6 +113,7 @@ export function BranchedChat({ chatId, onClose, selectedChatModel }: BranchedCha
           reload={reload}
           isReadonly={false}
           isArtifactVisible={false}
+          showRecommendations={isNewBranch}
         />
       </div>
 

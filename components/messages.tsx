@@ -8,9 +8,9 @@ import equal from 'fast-deep-equal';
 
 interface MessagesProps {
   chatId: string;
+  messages: Array<Message>;
   isLoading: boolean;
   votes: Array<Vote> | undefined;
-  messages: Array<Message>;
   setMessages: (
     messages: Message[] | ((messages: Message[]) => Message[]),
   ) => void;
@@ -19,16 +19,19 @@ interface MessagesProps {
   ) => Promise<string | null | undefined>;
   isReadonly: boolean;
   isArtifactVisible: boolean;
+  showRecommendations?: boolean;
 }
 
 function PureMessages({
   chatId,
+  messages,
   isLoading,
   votes,
-  messages,
   setMessages,
   reload,
   isReadonly,
+  isArtifactVisible,
+  showRecommendations = true,
 }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -42,11 +45,12 @@ function PureMessages({
 
       {messages.map((message, index) => (
         <PreviewMessage
-          key={message.id}
-          index={index}
           chatId={chatId}
+          key={message.id}
           message={message}
-          isLoading={isLoading && messages.length - 1 === index}
+          messages={messages}
+          isLoading={isLoading && index === messages.length - 1}
+          index={index}
           vote={
             votes
               ? votes.find((vote) => vote.messageId === message.id)
@@ -55,7 +59,7 @@ function PureMessages({
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
-          messages={messages}
+          showRecommendations={showRecommendations}
         />
       ))}
 
@@ -71,14 +75,14 @@ function PureMessages({
   );
 }
 
-export const Messages = memo(PureMessages, (prevProps, nextProps) => {
-  if (prevProps.isArtifactVisible && nextProps.isArtifactVisible) return true;
-
+function areEqual(prevProps: MessagesProps, nextProps: MessagesProps) {
   if (prevProps.isLoading !== nextProps.isLoading) return false;
   if (prevProps.isLoading && nextProps.isLoading) return false;
   if (prevProps.messages.length !== nextProps.messages.length) return false;
-  if (!equal(prevProps.messages, nextProps.messages)) return false;
   if (!equal(prevProps.votes, nextProps.votes)) return false;
+  if (prevProps.isArtifactVisible !== nextProps.isArtifactVisible) return false;
 
   return true;
-});
+}
+
+export const Messages = memo(PureMessages, areEqual);
