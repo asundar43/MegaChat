@@ -25,11 +25,15 @@ export async function POST(request: Request) {
     const branchedMessages = messages.slice(0, messageIndex + 1);
     const newChatId = generateUUID();
 
-    // Generate a title based on the first user message
-    const firstUserMessage = branchedMessages.find(m => m.role === 'user');
-    const title = firstUserMessage 
-      ? await generateTitleFromUserMessage({ message: firstUserMessage })
-      : 'Branched Chat';
+    // Generate a title based on the message we're branching from
+    const branchMessage = messages[messageIndex];
+    const title = await generateTitleFromUserMessage({
+      message: {
+        id: generateUUID(),
+        role: 'user',
+        content: `Branch from: ${branchMessage.content}`,
+      },
+    });
 
     // Save the new chat with parent reference
     await saveChat({

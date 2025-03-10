@@ -28,6 +28,38 @@ import { myProvider } from '@/lib/ai/providers';
 
 export const maxDuration = 60;
 
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return new Response('Chat ID is required', { status: 400 });
+  }
+
+  const session = await auth();
+
+  if (!session || !session.user) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  try {
+    const chat = await getChatById({ id });
+
+    if (!chat) {
+      return new Response('Chat not found', { status: 404 });
+    }
+
+    if (chat.visibility === 'private' && chat.userId !== session.user.id) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    return Response.json(chat);
+  } catch (error) {
+    console.error('Failed to fetch chat:', error);
+    return new Response('Internal Server Error', { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const {

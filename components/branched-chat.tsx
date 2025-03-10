@@ -9,8 +9,9 @@ import { toast } from 'sonner';
 import { generateUUID } from '@/lib/utils';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/utils';
-import { CrossIcon } from './icons';
+import { BranchIcon, CrossIcon } from './icons';
 import { Button } from './ui/button';
+import { Chat } from '@/lib/db/schema';
 
 interface BranchedChatProps {
   chatId: string;
@@ -22,6 +23,15 @@ export function BranchedChat({ chatId, onClose, selectedChatModel }: BranchedCha
   const { width: windowWidth } = useWindowSize();
   const { open: isSidebarOpen } = useSidebar();
   const isMobile = windowWidth ? windowWidth < 768 : false;
+
+  const { data: chat, error } = useSWR<Chat>(`/api/chat?id=${chatId}`, fetcher);
+
+  useEffect(() => {
+    if (error) {
+      console.error('Failed to fetch chat:', error);
+      toast.error('Failed to load chat details');
+    }
+  }, [error]);
 
   const {
     messages,
@@ -60,7 +70,19 @@ export function BranchedChat({ chatId, onClose, selectedChatModel }: BranchedCha
       }}
     >
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-sm font-medium">Branched Chat</h2>
+        <div className="flex items-center gap-2">
+          <div className="text-muted-foreground">
+            <BranchIcon size={14} />
+          </div>
+          <div className="flex flex-col">
+            <h2 className="text-sm font-medium">
+              Branched Chat
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              {error ? 'Error loading chat' : chat?.title || 'Loading...'}
+            </p>
+          </div>
+        </div>
         <Button
           variant="ghost"
           size="icon"
