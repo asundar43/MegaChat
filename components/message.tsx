@@ -30,6 +30,7 @@ const PurePreviewMessage = ({
   index,
   messages,
   showRecommendations = true,
+  isBranchedFrom = false,
 }: {
   chatId: string;
   message: Message;
@@ -45,6 +46,7 @@ const PurePreviewMessage = ({
   index: number;
   messages: Message[];
   showRecommendations?: boolean;
+  isBranchedFrom?: boolean;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
@@ -67,7 +69,12 @@ const PurePreviewMessage = ({
           )}
         >
           {message.role === 'assistant' && (
-            <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
+            <div className={cn(
+              "size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background",
+              {
+                "ring-2 ring-primary": isBranchedFrom,
+              }
+            )}>
               <div className="translate-y-px">
                 <SparklesIcon size={14} />
               </div>

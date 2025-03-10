@@ -18,13 +18,15 @@ interface BranchedChatProps {
   onClose: () => void;
   selectedChatModel: string;
   isNewBranch?: boolean;
+  branchedFromMessageId?: string;
 }
 
 export function BranchedChat({ 
   chatId, 
   onClose, 
   selectedChatModel,
-  isNewBranch = false 
+  isNewBranch = false,
+  branchedFromMessageId
 }: BranchedChatProps) {
   const { width: windowWidth } = useWindowSize();
   const { open: isSidebarOpen } = useSidebar();
@@ -69,7 +71,7 @@ export function BranchedChat({
 
   return (
     <motion.div
-      className="flex flex-col h-full w-[50%] border-l border-border bg-background"
+      className="flex flex-col h-full w-[50%] border-l border-border bg-background relative"
       initial={{ x: '100%', opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: '100%', opacity: 0 }}
@@ -114,6 +116,7 @@ export function BranchedChat({
           isReadonly={false}
           isArtifactVisible={false}
           showRecommendations={isNewBranch}
+          branchedFromMessageId={branchedFromMessageId}
         />
       </div>
 

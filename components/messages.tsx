@@ -5,6 +5,7 @@ import { Overview } from './overview';
 import { memo } from 'react';
 import { Vote } from '@/lib/db/schema';
 import equal from 'fast-deep-equal';
+import { cn } from '@/lib/utils';
 
 interface MessagesProps {
   chatId: string;
@@ -20,6 +21,7 @@ interface MessagesProps {
   isReadonly: boolean;
   isArtifactVisible: boolean;
   showRecommendations?: boolean;
+  branchedFromMessageId?: string;
 }
 
 function PureMessages({
@@ -32,6 +34,7 @@ function PureMessages({
   isReadonly,
   isArtifactVisible,
   showRecommendations = true,
+  branchedFromMessageId,
 }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -39,9 +42,13 @@ function PureMessages({
   return (
     <div
       ref={messagesContainerRef}
-      className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
+      className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 relative"
     >
       {messages.length === 0 && <Overview />}
+
+      {branchedFromMessageId && (
+        <div className="absolute left-[28px] top-0 bottom-0 w-px bg-gradient-to-b from-border to-transparent pointer-events-none" />
+      )}
 
       {messages.map((message, index) => (
         <PreviewMessage
@@ -60,6 +67,7 @@ function PureMessages({
           reload={reload}
           isReadonly={isReadonly}
           showRecommendations={showRecommendations}
+          isBranchedFrom={message.id === branchedFromMessageId}
         />
       ))}
 

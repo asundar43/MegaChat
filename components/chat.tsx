@@ -32,7 +32,7 @@ export function Chat({
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
-  const { isVisible, chatId, isNewBranch, hide } = useBranchedChat();
+  const { isVisible, chatId, isNewBranch, hide, branchedFromMessageId } = useBranchedChat();
 
   const {
     messages,
@@ -89,6 +89,7 @@ export function Chat({
           reload={reload}
           isReadonly={isReadonly}
           isArtifactVisible={isArtifactVisible}
+          branchedFromMessageId={id === chatId ? branchedFromMessageId : undefined}
         />
 
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
@@ -117,6 +118,7 @@ export function Chat({
             onClose={hide}
             selectedChatModel={selectedChatModel}
             isNewBranch={isNewBranch}
+            branchedFromMessageId={branchedFromMessageId}
           />
         )}
       </AnimatePresence>

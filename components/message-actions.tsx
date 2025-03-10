@@ -59,20 +59,20 @@ function PureMessageActions({
       }
 
       const { chatId: branchedChatId } = await response.json();
-      showBranchedChat(branchedChatId, true);
+      showBranchedChat(branchedChatId, true, message.id);
     } catch (error) {
       console.error('Failed to branch chat:', error);
       toast.error('Failed to branch chat');
     }
   };
 
-  if (isLoading || message.role === 'user' || message.toolInvocations) {
+  if (isLoading || message.role === 'user') {
     return null;
   }
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 items-center opacity-0 group-hover/message:opacity-100">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
