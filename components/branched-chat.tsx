@@ -71,6 +71,7 @@ export function BranchedChat({
 
   return (
     <motion.div
+      data-branch-window
       className="flex flex-col h-full w-[50%] border-l border-border bg-background relative"
       initial={{ x: '100%', opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}

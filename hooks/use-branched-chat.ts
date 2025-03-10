@@ -2,19 +2,19 @@ import { create } from 'zustand';
 
 interface BranchedChatState {
   isVisible: boolean;
-  chatId: string | null;
+  chatId: string | undefined;
   isNewBranch: boolean;
-  branchedFromMessageId: string | null;
-  show: (chatId: string, isNewBranch?: boolean, branchedFromMessageId?: string | null) => void;
+  branchedFromMessageId: string | undefined;
+  show: (chatId: string, isNewBranch?: boolean, branchedFromMessageId?: string) => void;
   hide: () => void;
 }
 
 export const useBranchedChat = create<BranchedChatState>((set) => ({
   isVisible: false,
-  chatId: null,
+  chatId: undefined,
   isNewBranch: false,
-  branchedFromMessageId: null,
-  show: (chatId: string, isNewBranch = false, branchedFromMessageId = null) =>
+  branchedFromMessageId: undefined,
+  show: (chatId: string, isNewBranch = false, branchedFromMessageId?: string) =>
     set({ isVisible: true, chatId, isNewBranch, branchedFromMessageId }),
-  hide: () => set({ isVisible: false, chatId: null, isNewBranch: false, branchedFromMessageId: null }),
+  hide: () => set({ isVisible: false, chatId: undefined, isNewBranch: false, branchedFromMessageId: undefined }),
 })); 
