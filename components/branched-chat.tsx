@@ -130,19 +130,21 @@ export function BranchedChat({
       </div>
 
       <div className="p-4 border-t bg-background relative z-10">
-        <MultimodalInput
-          chatId={chatId}
-          input={input}
-          setInput={setInput}
-          handleSubmit={handleSubmit}
-          isLoading={isLoading}
-          stop={stop}
-          attachments={[]}
-          setAttachments={() => {}}
-          messages={messages}
-          setMessages={setMessages}
-          append={append}
-        />
+        <div className="w-full max-w-3xl mx-auto">
+          <MultimodalInput
+            chatId={chatId}
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleSubmit}
+            isLoading={isLoading}
+            stop={stop}
+            attachments={[]}
+            setAttachments={() => {}}
+            messages={messages}
+            setMessages={setMessages}
+            append={append}
+          />
+        </div>
       </div>
     </motion.div>
   );

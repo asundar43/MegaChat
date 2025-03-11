@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { Attachment, Message } from 'ai';
 import { useChat } from '@ai-sdk/react';
 import { useState } from 'react';
@@ -19,6 +19,7 @@ import { useBranchedChat } from '@/hooks/use-branched-chat';
 import { AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BranchConnection } from './branch-connection';
+import { ResizableDivider } from './resizable-divider';
 
 // Define a set of vibrant colors for branches
 const BRANCH_COLORS = [
@@ -51,7 +52,40 @@ export function Chat({
   const { branches, removeBranch } = useBranchedChat();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
-  const mainChatWidth = `${100 / (branches.length + 1)}%`;
+  // Track widths of each panel (main chat + branches)
+  const [panelWidths, setPanelWidths] = useState<number[]>([]);
+
+  // Initialize panel widths when branches change
+  useEffect(() => {
+    const totalPanels = branches.length + 1;
+    const equalWidth = 100 / totalPanels;
+    setPanelWidths(new Array(totalPanels).fill(equalWidth));
+  }, [branches.length]);
+
+  // Handle resizing between panels
+  const handleResize = (index: number, delta: number) => {
+    setPanelWidths(currentWidths => {
+      if (!currentWidths.length) return currentWidths;
+
+      const newWidths = [...currentWidths];
+      const totalWidth = newWidths.reduce((sum, width) => sum + width, 0);
+      
+      // Convert delta to percentage
+      const deltaPercent = (delta / window.innerWidth) * 100;
+      
+      // Ensure minimum width of 15%
+      const minWidth = 15;
+      const leftNewWidth = newWidths[index] + deltaPercent;
+      const rightNewWidth = newWidths[index + 1] - deltaPercent;
+      
+      if (leftNewWidth < minWidth || rightNewWidth < minWidth) return currentWidths;
+      
+      newWidths[index] = leftNewWidth;
+      newWidths[index + 1] = rightNewWidth;
+      
+      return newWidths;
+    });
+  };
 
   const {
     messages,
@@ -87,10 +121,10 @@ export function Chat({
 
   return (
     <div className="flex flex-row w-full h-dvh">
-      <div className={cn("flex flex-col min-w-0 bg-background transition-all", {
-        "w-full": branches.length === 0,
-        [`w-[${mainChatWidth}]`]: branches.length > 0,
-      })}>
+      <div 
+        className="flex flex-col min-w-0 bg-background transition-all relative"
+        style={{ width: `${panelWidths[0] || 100}%` }}
+      >
         <ChatHeader
           chatId={id}
           selectedModelId={selectedChatModel}
@@ -111,23 +145,32 @@ export function Chat({
           branchedFromMessageId={undefined}
         />
 
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl relative z-10 border-t shadow-[0_-1px_2px_rgba(0,0,0,0.03)]">
-          {!isReadonly && (
-            <MultimodalInput
-              chatId={id}
-              input={input}
-              setInput={setInput}
-              handleSubmit={handleSubmit}
-              isLoading={isLoading}
-              stop={stop}
-              attachments={attachments}
-              setAttachments={setAttachments}
-              messages={messages}
-              setMessages={setMessages}
-              append={append}
-            />
-          )}
+        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full relative z-10 border-t shadow-[0_-1px_2px_rgba(0,0,0,0.03)]">
+          <div className="w-full max-w-3xl mx-auto">
+            {!isReadonly && (
+              <MultimodalInput
+                chatId={id}
+                input={input}
+                setInput={setInput}
+                handleSubmit={handleSubmit}
+                isLoading={isLoading}
+                stop={stop}
+                attachments={attachments}
+                setAttachments={setAttachments}
+                messages={messages}
+                setMessages={setMessages}
+                append={append}
+              />
+            )}
+          </div>
         </form>
+
+        {branches.length > 0 && (
+          <ResizableDivider
+            color={BRANCH_COLORS[0]}
+            onResize={(delta) => handleResize(0, delta)}
+          />
+        )}
       </div>
 
       <AnimatePresence>
@@ -142,15 +185,22 @@ export function Chat({
                   color={branchColor}
                 />
               )}
-              <BranchedChat
-                chatId={branch.chatId}
-                onClose={() => removeBranch(branch.chatId)}
-                selectedChatModel={selectedChatModel}
-                isNewBranch={branch.isNewBranch}
-                branchedFromMessageId={branch.branchedFromMessageId}
-                style={{ width: `${100 / (branches.length + 1)}%` }}
-                color={branchColor}
-              />
+              <div className="relative" style={{ width: `${panelWidths[index + 1] || 0}%` }}>
+                <BranchedChat
+                  chatId={branch.chatId}
+                  onClose={() => removeBranch(branch.chatId)}
+                  selectedChatModel={selectedChatModel}
+                  isNewBranch={branch.isNewBranch}
+                  branchedFromMessageId={branch.branchedFromMessageId}
+                  color={branchColor}
+                />
+                {index < branches.length - 1 && (
+                  <ResizableDivider
+                    color={BRANCH_COLORS[(index + 1) % BRANCH_COLORS.length]}
+                    onResize={(delta) => handleResize(index + 1, delta)}
+                  />
+                )}
+              </div>
             </React.Fragment>
           );
         })}
