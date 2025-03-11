@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import type { Attachment, Message } from 'ai';
 import { useChat } from '@ai-sdk/react';
 import { useState } from 'react';
@@ -19,6 +20,20 @@ import { AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BranchConnection } from './branch-connection';
 
+// Define a set of vibrant colors for branches
+const BRANCH_COLORS = [
+  '#FF5F7E', // Coral Pink
+  '#4A9DFF', // Bright Blue
+  '#FFB443', // Warm Orange
+  '#22D3AA', // Turquoise
+  '#985FFF', // Purple
+  '#FF6B2C', // Deep Orange
+  '#00C2A8', // Teal
+  '#FF4F81', // Hot Pink
+  '#36A2EB', // Sky Blue
+  '#FFA600', // Amber
+];
+
 export function Chat({
   id,
   initialMessages,
@@ -33,7 +48,10 @@ export function Chat({
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
-  const { isVisible, chatId, isNewBranch, hide, branchedFromMessageId } = useBranchedChat();
+  const { branches, removeBranch } = useBranchedChat();
+  const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
+
+  const mainChatWidth = `${100 / (branches.length + 1)}%`;
 
   const {
     messages,
@@ -66,13 +84,12 @@ export function Chat({
   );
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
-  const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
   return (
     <div className="flex flex-row w-full h-dvh">
       <div className={cn("flex flex-col min-w-0 bg-background transition-all", {
-        "w-full": !isVisible,
-        "w-[50%]": isVisible,
+        "w-full": branches.length === 0,
+        [`w-[${mainChatWidth}]`]: branches.length > 0,
       })}>
         <ChatHeader
           chatId={id}
@@ -81,8 +98,6 @@ export function Chat({
           isReadonly={isReadonly}
           className="relative z-10"
         />
-
-        {branchedFromMessageId && <BranchConnection messageId={branchedFromMessageId} />}
 
         <Messages
           chatId={id}
@@ -93,7 +108,7 @@ export function Chat({
           reload={reload}
           isReadonly={isReadonly}
           isArtifactVisible={isArtifactVisible}
-          branchedFromMessageId={branchedFromMessageId}
+          branchedFromMessageId={undefined}
         />
 
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl relative z-10 border-t shadow-[0_-1px_2px_rgba(0,0,0,0.03)]">
@@ -116,18 +131,29 @@ export function Chat({
       </div>
 
       <AnimatePresence>
-        {isVisible && chatId && (
-          <>
-            {branchedFromMessageId && <BranchConnection messageId={branchedFromMessageId} />}
-            <BranchedChat
-              chatId={chatId}
-              onClose={hide}
-              selectedChatModel={selectedChatModel}
-              isNewBranch={isNewBranch}
-              branchedFromMessageId={branchedFromMessageId}
-            />
-          </>
-        )}
+        {branches.map((branch, index) => {
+          const branchColor = BRANCH_COLORS[index % BRANCH_COLORS.length];
+          return (
+            <React.Fragment key={branch.chatId}>
+              {branch.branchedFromMessageId && (
+                <BranchConnection 
+                  messageId={branch.branchedFromMessageId} 
+                  targetBranchId={branch.chatId}
+                  color={branchColor}
+                />
+              )}
+              <BranchedChat
+                chatId={branch.chatId}
+                onClose={() => removeBranch(branch.chatId)}
+                selectedChatModel={selectedChatModel}
+                isNewBranch={branch.isNewBranch}
+                branchedFromMessageId={branch.branchedFromMessageId}
+                style={{ width: `${100 / (branches.length + 1)}%` }}
+                color={branchColor}
+              />
+            </React.Fragment>
+          );
+        })}
       </AnimatePresence>
 
       <Artifact

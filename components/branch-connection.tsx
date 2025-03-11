@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 
 interface BranchConnectionProps {
   messageId: string;
+  targetBranchId: string;
+  color: string;
 }
 
-export function BranchConnection({ messageId }: BranchConnectionProps) {
+export function BranchConnection({ messageId, targetBranchId, color }: BranchConnectionProps) {
   const [path, setPath] = useState<string>('');
 
   useEffect(() => {
@@ -13,8 +15,9 @@ export function BranchConnection({ messageId }: BranchConnectionProps) {
       const sourceMessage = document.querySelector(`[data-message-id="${messageId}"]`);
       const sourceIcon = sourceMessage?.querySelector('.size-8'); // The AI icon container
 
-      // Find the first message in the branch chat and its AI icon
-      const branchMessage = document.querySelector('[data-branch-window] [data-role="assistant"]');
+      // Find the specific branch window and its first AI message icon
+      const branchWindow = document.querySelector(`[data-branch-window="${targetBranchId}"]`);
+      const branchMessage = branchWindow?.querySelector('[data-role="assistant"]');
       const branchIcon = branchMessage?.querySelector('.size-8');
 
       if (!sourceIcon || !branchIcon) return;
@@ -23,7 +26,6 @@ export function BranchConnection({ messageId }: BranchConnectionProps) {
       const branchRect = branchIcon.getBoundingClientRect();
 
       // Get the computed transform matrix of the branch window
-      const branchWindow = document.querySelector('[data-branch-window]');
       if (!branchWindow) return;
       
       const transform = window.getComputedStyle(branchWindow).transform;
@@ -95,8 +97,8 @@ export function BranchConnection({ messageId }: BranchConnectionProps) {
       }
     });
 
-    // Start observing the branch chat container for new messages
-    const branchContainer = document.querySelector('[data-branch-window] .overflow-y-scroll');
+    // Start observing the specific branch chat container for new messages
+    const branchContainer = document.querySelector(`[data-branch-window="${targetBranchId}"] .overflow-y-scroll`);
     if (branchContainer) {
       observer.observe(branchContainer, {
         childList: true,
@@ -112,7 +114,7 @@ export function BranchConnection({ messageId }: BranchConnectionProps) {
       clearInterval(interval);
       observer.disconnect();
     };
-  }, [messageId]);
+  }, [messageId, targetBranchId]);
 
   if (!path) return null;
 
@@ -129,9 +131,9 @@ export function BranchConnection({ messageId }: BranchConnectionProps) {
       <path
         d={path}
         fill="none"
-        stroke="hsl(var(--muted-foreground))"
+        stroke={color}
         strokeWidth="1.5"
-        strokeOpacity="0.4"
+        strokeOpacity="0.8"
         strokeDasharray="2 3"
         filter="drop-shadow(0 1px 1px rgb(0 0 0 / 0.05))"
         strokeLinecap="round"

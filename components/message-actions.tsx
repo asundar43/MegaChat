@@ -38,7 +38,7 @@ function PureMessageActions({
   const { mutate } = useSWRConfig();
   const [_, copyToClipboard] = useCopyToClipboard();
   const router = useRouter();
-  const { show: showBranchedChat } = useBranchedChat();
+  const { addBranch } = useBranchedChat();
 
   const handleBranch = async () => {
     try {
@@ -59,7 +59,7 @@ function PureMessageActions({
       }
 
       const { chatId: branchedChatId } = await response.json();
-      showBranchedChat(branchedChatId, true, message.id);
+      addBranch(branchedChatId, true, message.id);
     } catch (error) {
       console.error('Failed to branch chat:', error);
       toast.error('Failed to branch chat');

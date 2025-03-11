@@ -19,6 +19,8 @@ interface BranchedChatProps {
   selectedChatModel: string;
   isNewBranch?: boolean;
   branchedFromMessageId?: string;
+  style?: React.CSSProperties;
+  color: string;
 }
 
 export function BranchedChat({ 
@@ -26,7 +28,9 @@ export function BranchedChat({
   onClose, 
   selectedChatModel,
   isNewBranch = false,
-  branchedFromMessageId
+  branchedFromMessageId,
+  style,
+  color
 }: BranchedChatProps) {
   const { width: windowWidth } = useWindowSize();
   const { open: isSidebarOpen } = useSidebar();
@@ -71,8 +75,8 @@ export function BranchedChat({
 
   return (
     <motion.div
-      data-branch-window
-      className="flex flex-col h-full w-[50%] border-l border-border bg-background relative"
+      data-branch-window={chatId}
+      className="flex flex-col h-full border-l border-border bg-background relative"
       initial={{ x: '100%', opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: '100%', opacity: 0 }}
@@ -81,10 +85,14 @@ export function BranchedChat({
         stiffness: 300,
         damping: 30,
       }}
+      style={{
+        ...style,
+        borderLeftColor: color,
+      }}
     >
       <div className="flex justify-between items-center p-4 border-b bg-background relative z-10">
         <div className="flex items-center gap-2">
-          <div className="text-muted-foreground">
+          <div className="text-muted-foreground" style={{ color }}>
             <BranchIcon size={14} />
           </div>
           <div className="flex flex-col">
