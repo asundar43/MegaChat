@@ -71,7 +71,7 @@ const PurePreviewMessage = ({
         >
           {message.role === 'assistant' && (
             <div className={cn(
-              "size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background",
+              "size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background relative z-[200]",
               {
                 "ring-2 ring-primary": isBranchedFrom,
               }

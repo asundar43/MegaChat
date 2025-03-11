@@ -51,44 +51,21 @@ export function BranchConnection({ messageId }: BranchConnectionProps) {
       const sourceText = sourceMessage?.querySelector('.flex.flex-col.gap-4');
       const sourceTextRect = sourceText?.getBoundingClientRect();
       
-      // Calculate the curve with control points to clear all content
-      const dx = endX - startX;
-      const dy = endY - startY;
-      
       // Calculate drop amount to clear all content
       const textClearance = sourceTextRect 
-        ? (sourceTextRect.bottom - startY) + 40 // Increased padding to 40px
-        : 80; // Increased fallback clearance
+        ? (sourceTextRect.bottom - startY) + 20 // Padding below text
+        : 60; // Default drop if no text
+
+      const cornerRadius = 12; // Slightly larger radius for smoother corners
       
-      // Control points
-      // First drop straight down past text
-      const c1x = startX;
-      const c1y = startY + textClearance;
-      
-      // Curve out horizontally with more space
-      const c2x = startX + dx * 0.15; // Reduced from 0.2 for smoother curve
-      const c2y = startY + textClearance;
-      
-      // Middle point with more drop
-      const midX = startX + dx * 0.5;
-      const midY = startY + textClearance;
-      
-      // Start curving up with more space
-      const c3x = startX + dx * 0.85; // Increased from 0.8 for smoother curve
-      const c3y = startY + textClearance;
-      
-      // Final approach with more space
-      const c4x = endX;
-      const c4y = endY + 30; // Increased from 20px for more gradual approach
-      
+      // Simple down-right-up path with rounded corners
       const path = `
         M ${startX} ${startY}
-        C ${c1x} ${c1y},
-          ${c2x} ${c2y},
-          ${midX} ${midY}
-        C ${c3x} ${c3y},
-          ${c4x} ${c4y},
-          ${endX} ${endY}
+        L ${startX} ${startY + textClearance - cornerRadius}
+        Q ${startX} ${startY + textClearance} ${startX + cornerRadius} ${startY + textClearance}
+        L ${endX - cornerRadius} ${startY + textClearance}
+        Q ${endX} ${startY + textClearance} ${endX} ${startY + textClearance - cornerRadius}
+        L ${endX} ${endY}
       `;
 
       setPath(path);
@@ -146,7 +123,7 @@ export function BranchConnection({ messageId }: BranchConnectionProps) {
         position: 'fixed', 
         width: '100vw', 
         height: '100vh',
-        zIndex: 100 // Lower z-index so it goes under messages
+        zIndex: 1 // Put it on same layer as messages
       }}
     >
       <path

@@ -82,7 +82,7 @@ export function BranchedChat({
         damping: 30,
       }}
     >
-      <div className="flex justify-between items-center p-4 border-b">
+      <div className="flex justify-between items-center p-4 border-b bg-background relative z-10">
         <div className="flex items-center gap-2">
           <div className="text-muted-foreground">
             <BranchIcon size={14} />
@@ -106,7 +106,7 @@ export function BranchedChat({
         </Button>
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-y-scroll">
         <Messages
           chatId={chatId}
           messages={messages}
@@ -116,12 +116,12 @@ export function BranchedChat({
           reload={reload}
           isReadonly={false}
           isArtifactVisible={false}
-          showRecommendations={isNewBranch}
+          showRecommendations={false}
           branchedFromMessageId={branchedFromMessageId}
         />
       </div>
 
-      <div className="p-4 border-t">
+      <div className="p-4 border-t bg-background relative z-10">
         <MultimodalInput
           chatId={chatId}
           input={input}

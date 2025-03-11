@@ -79,7 +79,10 @@ export function Chat({
           selectedModelId={selectedChatModel}
           selectedVisibilityType={selectedVisibilityType}
           isReadonly={isReadonly}
+          className="relative z-10"
         />
+
+        {branchedFromMessageId && <BranchConnection messageId={branchedFromMessageId} />}
 
         <Messages
           chatId={id}
@@ -90,10 +93,10 @@ export function Chat({
           reload={reload}
           isReadonly={isReadonly}
           isArtifactVisible={isArtifactVisible}
-          branchedFromMessageId={id === chatId ? undefined : branchedFromMessageId}
+          branchedFromMessageId={branchedFromMessageId}
         />
 
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
+        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl relative z-10 border-t shadow-[0_-1px_2px_rgba(0,0,0,0.03)]">
           {!isReadonly && (
             <MultimodalInput
               chatId={id}
