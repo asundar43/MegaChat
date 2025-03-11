@@ -143,6 +143,7 @@ export function BranchedChat({
             messages={messages}
             setMessages={setMessages}
             append={append}
+            className="min-h-[24px] max-h-[98px]"
           />
         </div>
       </div>

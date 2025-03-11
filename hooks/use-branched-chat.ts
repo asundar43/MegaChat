@@ -10,6 +10,7 @@ interface BranchedChatState {
   branches: BranchedChat[];
   addBranch: (chatId: string, isNewBranch?: boolean, branchedFromMessageId?: string) => void;
   removeBranch: (chatId: string) => void;
+  show: (chatId: string) => void;
 }
 
 export const useBranchedChat = create<BranchedChatState>((set) => ({
@@ -21,5 +22,9 @@ export const useBranchedChat = create<BranchedChatState>((set) => ({
   removeBranch: (chatId: string) =>
     set((state) => ({
       branches: state.branches.filter(branch => branch.chatId !== chatId),
+    })),
+  show: (chatId: string) =>
+    set((state) => ({
+      branches: [...state.branches, { chatId, isNewBranch: false, branchedFromMessageId: undefined }],
     })),
 })); 
