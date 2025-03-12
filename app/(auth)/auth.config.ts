@@ -2,7 +2,7 @@ import type { NextAuthConfig } from 'next-auth';
 
 export const authConfig = {
   pages: {
-    signIn: '/login',
+    signIn: '/auth/login',
     newUser: '/',
   },
   providers: [
@@ -12,12 +12,17 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnChat = nextUrl.pathname.startsWith('/');
-      const isOnRegister = nextUrl.pathname.startsWith('/register');
-      const isOnLogin = nextUrl.pathname.startsWith('/login');
+      const isOnChat = nextUrl.pathname.startsWith('/chat');
+      const isOnRegister = nextUrl.pathname.startsWith('/auth/register');
+      const isOnLogin = nextUrl.pathname.startsWith('/auth/login');
+      const isOnLanding = nextUrl.pathname === '/';
+
+      if (isOnLanding) {
+        return true; // Always allow access to landing page
+      }
 
       if (isLoggedIn && (isOnLogin || isOnRegister)) {
-        return Response.redirect(new URL('/', nextUrl as unknown as URL));
+        return Response.redirect(new URL('/chat', nextUrl as unknown as URL));
       }
 
       if (isOnRegister || isOnLogin) {
@@ -25,12 +30,7 @@ export const authConfig = {
       }
 
       if (isOnChat) {
-        if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
-      }
-
-      if (isLoggedIn) {
-        return Response.redirect(new URL('/', nextUrl as unknown as URL));
+        return isLoggedIn; // Require auth for chat pages
       }
 
       return true;
