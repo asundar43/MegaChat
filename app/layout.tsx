@@ -10,28 +10,11 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
   title: 'branchGPT',
   description: 'Explore different AI responses without starting over. Branch your chats, explore multiple angles, and never lose your train of thought.',
-  icons: [
-    {
-      rel: 'icon',
-      url: '/branch-icon-light.svg',
-      media: '(prefers-color-scheme: light)',
-    },
-    {
-      rel: 'icon',
-      url: '/branch-icon-dark.svg',
-      media: '(prefers-color-scheme: dark)',
-    },
-    {
-      rel: 'apple-touch-icon',
-      url: '/branch-icon-light.svg',
-      media: '(prefers-color-scheme: light)',
-    },
-    {
-      rel: 'apple-touch-icon',
-      url: '/branch-icon-dark.svg',
-      media: '(prefers-color-scheme: dark)',
-    },
-  ],
+  icons: {
+    icon: '/branch-icon.svg',
+    shortcut: '/branch-icon.svg',
+    apple: '/branch-icon.svg',
+  },
 };
 
 export const viewport = {
