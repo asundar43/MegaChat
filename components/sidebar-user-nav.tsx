@@ -48,6 +48,14 @@ export function SidebarUserNav({ user }: { user: User }) {
             >
               {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
             </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={() => {
+                window.location.href = 'https://billing.stripe.com/p/login/8wMcNl8m4co78o0aEE';
+              }}
+            >
+              Manage Billing
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <button

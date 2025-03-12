@@ -35,9 +35,14 @@ export default function Page() {
       });
     } else if (state.status === 'success') {
       toast({ type: 'success', description: 'Account created successfully!' });
-
       setIsSuccessful(true);
-      router.refresh();
+      
+      // Redirect to Stripe if URL is provided
+      if (state.redirectUrl) {
+        window.location.href = state.redirectUrl;
+      } else {
+        router.refresh();
+      }
     }
   }, [state, router]);
 

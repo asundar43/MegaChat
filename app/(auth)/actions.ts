@@ -49,6 +49,7 @@ export interface RegisterActionState {
     | 'failed'
     | 'user_exists'
     | 'invalid_data';
+  redirectUrl?: string;
 }
 
 export const register = async (
@@ -73,7 +74,9 @@ export const register = async (
       redirect: false,
     });
 
-    return { status: 'success' };
+    // Redirect to Stripe payment page after successful registration
+    const stripeUrl = 'https://buy.stripe.com/28o01V2hI6DJfmw8ww';
+    return { status: 'success', redirectUrl: stripeUrl };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { status: 'invalid_data' };
