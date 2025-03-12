@@ -72,7 +72,7 @@ function PureMessageActions({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-row gap-2 items-center opacity-0 group-hover/message:opacity-100">
+      <div className="flex flex-row gap-2 items-center opacity-0 group-hover/message:opacity-100 [&_[data-radix-popper-content-wrapper]]:!z-[9999]">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -93,14 +93,20 @@ function PureMessageActions({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                className="py-1 px-2 h-fit text-muted-foreground"
-                variant="outline"
+                className="py-1 px-2 h-fit relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-none shadow-lg animate-pulse"
                 onClick={handleBranch}
               >
-                <BranchIcon />
+                <div className="text-white">
+                  <BranchIcon />
+                </div>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Branch from this message</TooltipContent>
+            <TooltipContent>
+              <div className="flex flex-col gap-1">
+                <span className="font-medium">Branch this response</span>
+                <span className="text-xs text-muted-foreground">Explore a different path from here</span>
+              </div>
+            </TooltipContent>
           </Tooltip>
         )}
 
@@ -153,7 +159,11 @@ function PureMessageActions({
               <ThumbUpIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Upvote Response</TooltipContent>
+          <TooltipContent>
+            <div className="flex flex-col gap-1 relative z-[9999]">
+              <span className="font-medium">Upvote Response</span>
+            </div>
+          </TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -205,7 +215,11 @@ function PureMessageActions({
               <ThumbDownIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Downvote Response</TooltipContent>
+          <TooltipContent>
+            <div className="flex flex-col gap-1 relative z-[9999]">
+              <span className="font-medium">Downvote Response</span>
+            </div>
+          </TooltipContent>
         </Tooltip>
       </div>
     </TooltipProvider>
