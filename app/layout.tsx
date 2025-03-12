@@ -8,8 +8,30 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+  title: 'branchGPT',
+  description: 'Explore different AI responses without starting over. Branch your chats, explore multiple angles, and never lose your train of thought.',
+  icons: [
+    {
+      rel: 'icon',
+      url: '/branch-icon-light.svg',
+      media: '(prefers-color-scheme: light)',
+    },
+    {
+      rel: 'icon',
+      url: '/branch-icon-dark.svg',
+      media: '(prefers-color-scheme: dark)',
+    },
+    {
+      rel: 'apple-touch-icon',
+      url: '/branch-icon-light.svg',
+      media: '(prefers-color-scheme: light)',
+    },
+    {
+      rel: 'apple-touch-icon',
+      url: '/branch-icon-dark.svg',
+      media: '(prefers-color-scheme: dark)',
+    },
+  ],
 };
 
 export const viewport = {
