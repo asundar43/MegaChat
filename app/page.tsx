@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import './styles.css'
+import { BrandIcon } from '@/components/icons'
 
 export default function LandingPage() {
   return (
@@ -60,7 +61,10 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed w-full p-6 z-50 mix-blend-difference">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="text-white/90 font-bold text-xl tracking-tight">branchGPT</div>
+          <div className="text-white/90 font-bold text-xl tracking-tight flex items-center gap-2">
+            <BrandIcon size={24} />
+            branchGPT
+          </div>
           <div className="flex items-center gap-4">
             <Link href="/auth/login">
               <Button variant="ghost" className="text-white hover:text-white/90 hover:bg-white/10 transition-colors">

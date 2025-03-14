@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { BrandIcon } from './icons';
 
 export function AppSidebar({ user }: { user: User | undefined }) {
   const router = useRouter();
@@ -34,6 +35,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               }}
               className="flex flex-row gap-3 items-center"
             >
+              <BrandIcon size={20} />
               <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
                 branchGPT
               </span>
@@ -46,7 +48,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   className="p-2 h-fit"
                   onClick={() => {
                     setOpenMobile(false);
-                    router.push('/');
+                    router.push('/chat');
                     router.refresh();
                   }}
                 >
