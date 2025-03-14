@@ -1,4 +1,6 @@
-import { hash, compare } from 'bcrypt-ts';
+import 'server-only';
+
+import { genSaltSync, hashSync } from 'bcrypt-ts';
 import { and, asc, desc, eq, gt, gte, inArray } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -34,12 +36,15 @@ export async function getUser(email: string): Promise<Array<User>> {
 }
 
 export async function createUser(email: string, password: string) {
-  const hashedPassword = await hash(password, 10);
-  const result = await db.insert(user).values({
-    email,
-    password: hashedPassword,
-  }).returning();
-  return result[0];
+  const salt = genSaltSync(10);
+  const hash = hashSync(password, salt);
+
+  try {
+    return await db.insert(user).values({ email, password: hash });
+  } catch (error) {
+    console.error('Failed to create user in database');
+    throw error;
+  }
 }
 
 export async function saveChat({

@@ -3,7 +3,7 @@ import type { NextAuthConfig } from 'next-auth';
 export const authConfig = {
   pages: {
     signIn: '/auth/login',
-    newUser: '/',
+    newUser: '/auth/register',
   },
   providers: [
     // added later in auth.ts since it requires bcrypt which is only compatible with Node.js
@@ -12,27 +12,27 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnChat = nextUrl.pathname.startsWith('/chat');
-      const isOnRegister = nextUrl.pathname.startsWith('/auth/register');
-      const isOnLogin = nextUrl.pathname.startsWith('/auth/login');
+      const isOnDashboard = nextUrl.pathname.startsWith('/chat');
+      const isOnAuth = nextUrl.pathname.startsWith('/auth');
       const isOnLanding = nextUrl.pathname === '/';
 
-      if (isOnLanding) {
-        return true; // Always allow access to landing page
+      // Allow access to landing page
+      if (isOnLanding) return true;
+
+      // Redirect logged-in users away from auth pages
+      if (isLoggedIn && isOnAuth) {
+        return Response.redirect(new URL('/chat', nextUrl));
       }
 
-      if (isLoggedIn && (isOnLogin || isOnRegister)) {
-        return Response.redirect(new URL('/chat', nextUrl as unknown as URL));
+      // Allow access to auth pages for non-logged-in users
+      if (isOnAuth) return true;
+
+      // Protect dashboard routes
+      if (isOnDashboard) {
+        return isLoggedIn;
       }
 
-      if (isOnRegister || isOnLogin) {
-        return true; // Always allow access to register and login pages
-      }
-
-      if (isOnChat) {
-        return isLoggedIn; // Require auth for chat pages
-      }
-
+      // Default allow
       return true;
     },
   },
